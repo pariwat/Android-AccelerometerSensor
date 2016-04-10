@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -53,9 +54,7 @@ public class MainActivity extends AppCompatActivity
     private LineChart mChart;
     private TextView info;
     private long time_old;
-    private String PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
-    private String filename ="log1.csv";
-    File f;
+
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -71,9 +70,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         verifyStoragePermissions(this);
-        f = new File(PATH+"/"+filename);
 
-        System.out.println("bank  PATH: "+PATH+"/"+filename);
 
 
         info = (TextView) findViewById(R.id.info);
@@ -239,20 +236,14 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             {
-
-                long speed = System.currentTimeMillis() - time_old;
+                long now = System.currentTimeMillis();
+                long speed = now - time_old;
                 DecimalFormat df = new DecimalFormat("0.00");
                 info.setText("Freq: " + df.format((float) (1.0 / speed)) + " Hz Time: " + (speed / 1000.0));
                 float x = intent.getFloatExtra("x", 0);
                 float y = intent.getFloatExtra("y", 0);
                 float z = intent.getFloatExtra("z", 0);
-                String buf ="X:" + x + "  Y:" + y + "  Z:" + z + "\n";
 
-                try {
-                    org.apache.commons.io.FileUtils.writeStringToFile(f,buf);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
                 LineData data = mChart.getData();
                 ILineDataSet dx = data.getDataSetByIndex(0);
